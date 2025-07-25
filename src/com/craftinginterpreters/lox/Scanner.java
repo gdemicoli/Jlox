@@ -2,8 +2,8 @@ package com.craftinginterpreters.lox;
 
 import static com.craftinginterpreters.lox.TokenType.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class Scanner {
@@ -98,7 +98,7 @@ class Scanner {
                 number();
             }
             else if (isAlpha(c)) {
-                indentifier();
+                identifier();
             }
             else {
                 Lox.error(line, "Unexpected character.");
@@ -108,11 +108,16 @@ class Scanner {
 
     }
 
-    private void identifer() {
+    private void identifier() {
         while (isAlphaNumeric(peek())) {
             advance();
         }
-        addToken(IDENTIFIER);
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+        if (type == null) {
+            type = IDENTIFIER;
+        }
+        addToken(type);
     }
 
     private void number() {
