@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
+ //Polymorphism: we use abstract Expr type, java automatically uses the correct subclass
+
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
         if(args.length !=1) {
@@ -32,10 +34,43 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + "{");
 
+        // AST Classes
+         for (String type : types) {
+            String className = type.split(":")[0].trim();
+            String fields = type.split(":")[1].trim();
+            defineType(writer, baseName, className, fields);
+
+         }
+
         writer.println("}");
         writer.close();
 
-            };
+        };
+    
+    private static void defineType(
+        PrintWriter writer, String baseName,
+        String className, String fieldList) {
+            writer.println(" static class " + className + " extends " + 
+                baseName + " {");
+
+                // Constructor
+                writer.println("   " + className + "(" + fieldList + ") {");
+
+                //Parameters in fields
+                String[] fields = fieldList.split(", ");
+                for (String field : fields) {
+                    String name = field.split(" ")[1];
+                    writer.println("     this." + name + " = " + name + ";");
+                }
+
+                writer.println("   }");
+
+                writer.println();
+                for (String field : fields) {
+                    writer.println("   final " + field + ";");
+                }
+                writer.println(" }");
+        }
         
 }
 
