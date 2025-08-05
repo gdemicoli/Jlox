@@ -41,8 +41,10 @@ public class GenerateAst {
             String className = type.split(":")[0].trim();
             String fields = type.split(":")[1].trim();
             defineType(writer, baseName, className, fields);
-
          }
+        
+         writer.println();
+         writer.println("   abstract <R> R accept(Visitor<R> visitor);");
 
         writer.println("}");
         writer.close();
@@ -85,6 +87,16 @@ public class GenerateAst {
                 for (String field : fields) {
                     writer.println("   final " + field + ";");
                 }
+                
+                writer.println();
+                writer.println("   @Override");
+                writer.println("   <R> R accept(Visitor<R> visitor) {");
+                writer.println("    return visitor.visit" +
+                    className + baseName +"(this);");
+                writer.println("   }");
+
+
+
                 writer.println(" }");
         }
         
