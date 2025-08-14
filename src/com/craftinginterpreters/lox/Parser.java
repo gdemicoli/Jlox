@@ -3,6 +3,7 @@ package com.craftinginterpreters.lox;
 import java.util.List;
 
 import static com.craftinginterpreters.lox.TokenType.*;
+import javax.crypto.interfaces.PBEKey;
 
 class Parser {
     private final List<Token> tokens;
@@ -20,7 +21,8 @@ class Parser {
 
     private Expr equality() {
         Expr expr = comparison();
-
+        // loops through equality operators e.g.: a == b !=c == d
+        // then returns when it hits a token that is not equality.
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
             Token operator = previous();
             Expr right = comparison();
@@ -29,4 +31,112 @@ class Parser {
 
         return expr;
     }
+
+    private Expr comparison() {
+        Expr expr = term();
+        // loops through comparison operators each time appending
+        // the previous expression to the left hand side of the current one
+        // e.g.: a < b <= c = ((a,<,b), <=, c)
+        while(match(GREATER,GREATER_EQUAL,LESS,LESS_EQUAL)) {
+            Token operator = previous();
+            Expr right = term();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr term() {
+        // Same as above 2 methods, exceptf for terms
+        Expr expr = factor();
+
+        while (match(MINUS, PLUS)) {
+            Token operator = previous();
+            Expr right = factor();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr factor() {
+
+        Expr expr = factor();
+
+        while (match(SLASH, STAR)) {
+            Token operator = previous();
+            Expr right = unary();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr unary() {
+        if(match(BANG, MINUS)) {
+            Token operator = previous();
+            Expr right = unary();
+            return new Expr.Unary(operator, right);
+        }
+
+        return primary();
+    }
+
+    private Expr primary() {
+        if (match(FALSE)) return new Expr.Literal(false);
+        if (match(TRUE)) return new Expr.Literal(true);
+        if (match(NIL)) return new Expr.Literal(null);
+
+        if (match(NUMBER, STRING)) {
+            return new Expr.Literal(previous().literal);
+        }
+
+        if (match(LEFT_PAREN)) {
+            Expr expr = expression();
+            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            return new Expr.Grouping(expr);
+        }
+    }
+
+
+
+    private boolean match(TokenType... types) {
+        // checks to see if the current token has any of the given types
+        for(TokenType type : types) {
+            if(check(type)) {
+                advance();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean check(TokenType type) {
+        // returns true if the current token is of the given type (doesn't consume it)
+        if (isAtEnd()){
+            return false;
+        }
+        return peek().type == type;
+    }
+
+    private Token advance() {
+        // consumes the current token & returns it
+        if(!isAtEnd()) {
+            current++;
+        }
+        return previous();
+    }
+
+    private  boolean isAtEnd() {
+        return peek().type == EOF;
+    }
+
+    private  Token peek() {
+        return tokens.get(current);
+    }
+
+    private Token previous() {
+        return tokens.get(current - 1);
+    }
+
 }
