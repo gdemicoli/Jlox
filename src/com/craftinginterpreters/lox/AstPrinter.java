@@ -55,6 +55,13 @@ class AstPrinter implements Expr.Visitor<String> {
                 new Expr.Literal(45.67))
         );
 
-        System.out.println(new AstPrinter().print(expression));
+        Expr expression2 = new Expr.Binary(
+            new Expr.Literal(2),
+            new Token(TokenType.STAR, "*", null, -1),
+            new Expr.Grouping(
+                new Expr.Literal(45.67))
+        );
+
+        System.out.println(new AstPrinter().print(expression2));
     }
 }
