@@ -1,7 +1,5 @@
 package com.craftinginterpreters.lox;
 
-import java.util.List;
-
 abstract class Expr{
    interface Visitor<R> {
    R visitBinaryExpr(Binary expr);
@@ -9,7 +7,10 @@ abstract class Expr{
    R visitLiteralExpr(Literal expr);
    R visitUnaryExpr(Unary expr);
 }
- static class Binary extends Expr {
+// visitor pattern high level:
+// we give the the class method e.g Binary
+// the object containg method we want it to pass itself in as an arguement
+static class Binary extends Expr {
    Binary(Expr left, Token operator, Expr right) {
      this.left = left;
      this.operator = operator;
