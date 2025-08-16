@@ -12,6 +12,15 @@ class Parser {
     Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
+
+    Expr parse(){
+     try {
+        return expression();
+     }   
+     catch (ParseError error) {
+        return null;
+     }
+    }
     //Each method for parsing a grammar rule produces an AST for that rule.
     //When the body of the rule contains a non terminal, we call that other rule's method
 
@@ -92,11 +101,15 @@ class Parser {
         }
 
         if (match(LEFT_PAREN)) {
+            // 1. gets ( 
+            // 2. parses inner expression
+            // 3. Will throw error up call stack if ) is not present
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
 
+        throw error(peek(), "Expect expression");
     }
 
 
@@ -148,8 +161,36 @@ class Parser {
     }
 
     private ParseError error(Token token, String message) {
+        // Only user for panic mode when parser cannot continue
         Lox.error(token, message);
         return new ParseError();
+    }
+
+    private void synchronise() {
+        // Looks for part of the file 
+        // which is outside of error boundary to start parsing
+        advance();
+
+        while(!isAtEnd()) {
+            if (previous().type == SEMICOLON) {
+                return;
+            }
+
+            switch(peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                return;
+            }
+
+            advance();
+        }
+
     }
 
 }
