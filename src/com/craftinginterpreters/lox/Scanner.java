@@ -24,44 +24,63 @@ class Scanner {
         keywords.put("if", IF);
         keywords.put("nil", NIL);
         keywords.put("or", OR);
-        keywords.put("print",  PRINT);
+        keywords.put("print", PRINT);
         keywords.put("return", RETURN);
-        keywords.put("super",  SUPER);
+        keywords.put("super", SUPER);
         keywords.put("this", THIS);
         keywords.put("true", TRUE);
         keywords.put("var", VAR);
-        keywords.put("while",  WHILE);
+        keywords.put("while", WHILE);
     }
-
 
     Scanner(String source) {
         this.source = source;
     }
 
     List<Token> scanTokens() {
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
 
             start = current;
             scanToken();
         }
-        
+
         tokens.add(new Token(EOF, "", null, line));
         return tokens;
-    } 
+    }
 
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(': addToken(LEFT_PAREN); break;
-            case ')': addToken(RIGHT_PAREN); break;
-            case '{': addToken(LEFT_BRACE); break;
-            case '}': addToken(RIGHT_BRACE); break;
-            case ',': addToken(COMMA); break;
-            case '.': addToken(DOT); break;
-            case '-': addToken(MINUS); break;
-            case '+': addToken(PLUS); break;
-            case ';': addToken(SEMICOLON); break;
-            case '*': addToken(STAR); break;
+            case '(':
+                addToken(LEFT_PAREN);
+                break;
+            case ')':
+                addToken(RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(LEFT_BRACE);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(COMMA);
+                break;
+            case '.':
+                addToken(DOT);
+                break;
+            case '-':
+                addToken(MINUS);
+                break;
+            case '+':
+                addToken(PLUS);
+                break;
+            case ';':
+                addToken(SEMICOLON);
+                break;
+            case '*':
+                addToken(STAR);
+                break;
             case '!':
                 addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
@@ -76,10 +95,10 @@ class Scanner {
                 break;
             case '/':
                 if (match('/')) {
-                    //A comment goes till end of line
-                    while (peek() != '\n' && !isAtEnd()) advance();
-                }
-                else {
+                    // A comment goes till end of line
+                    while (peek() != '\n' && !isAtEnd())
+                        advance();
+                } else {
                     addToken(SLASH);
                 }
                 break;
@@ -87,23 +106,23 @@ class Scanner {
             case '\r':
             case '\t':
                 break;
-            
+
             case '\n':
                 line++;
                 break;
-            case '"': string(); break;
+            case '"':
+                string();
+                break;
 
             default:
-            if (isDigit(c)){
-                number();
-            }
-            else if (isAlpha(c)) {
-                identifier();
-            }
-            else {
-                Lox.error(line, "Unexpected character.");
-                break;
-            }
+                if (isDigit(c)) {
+                    number();
+                } else if (isAlpha(c)) {
+                    identifier();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                    break;
+                }
         }
 
     }
@@ -127,40 +146,40 @@ class Scanner {
 
         // check for fractional part
 
-        if(peek() == '.' && isDigit(peekNext())) {
+        if (peek() == '.' && isDigit(peekNext())) {
             advance();
-            
-            while(isDigit(peek())){
+
+            while (isDigit(peek())) {
                 advance();
             }
         }
 
-        addToken(NUMBER, 
-            Double.parseDouble(source.substring(start, current)));
-        
+        addToken(NUMBER,
+                Double.parseDouble(source.substring(start, current)));
+
     }
 
     private void string() {
         while (peek() != '"' && !isAtEnd()) {
-            if(peek() == '\n'){
+            if (peek() == '\n') {
                 line++;
             }
             advance();
         }
 
-        if(isAtEnd()) {
+        if (isAtEnd()) {
             Lox.error(line, "Unterminated string.");
             return;
         }
 
         advance();
 
-        String value = source.substring(start+ 1, current - 1);
+        String value = source.substring(start + 1, current - 1);
         addToken(STRING, value);
     }
 
     private boolean match(char expected) {
-        if (isAtEnd()){
+        if (isAtEnd()) {
             return false;
         }
         if (source.charAt(current) != expected) {
@@ -178,7 +197,7 @@ class Scanner {
     }
 
     private char peekNext() {
-        if (current + 1 >= source.length()){
+        if (current + 1 >= source.length()) {
             return '\0';
         }
         return source.charAt(current + 1);
@@ -186,11 +205,11 @@ class Scanner {
 
     private boolean isAlpha(char c) {
         return (c >= 'a' && c <= 'z') ||
-        (c >= 'A' && c <= 'Z') ||
-         c == '_';
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
     }
 
-    private boolean isAlphaNumeric(char c){
+    private boolean isAlphaNumeric(char c) {
         return isAlpha(c) || isDigit(c);
     }
 
@@ -202,7 +221,7 @@ class Scanner {
         return current >= source.length();
     }
 
-    private  char advance() {
+    private char advance() {
         current++;
         return source.charAt(current - 1);
     }
@@ -216,4 +235,3 @@ class Scanner {
         tokens.add(new Token(type, text, literal, line));
     }
 }
-

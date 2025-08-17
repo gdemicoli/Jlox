@@ -26,25 +26,25 @@ public class Lox {
     byte[] bytes = Files.readAllBytes(Paths.get(path));
     run(new String(bytes, Charset.defaultCharset()));
 
-    if(hadError) {
+    if (hadError) {
       System.exit(65);
     }
   }
+
   private static void runPrompt() throws IOException {
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
 
-    for(;;) {
+    for (;;) {
       System.out.print("> ");
       String line = reader.readLine();
-      if (line == null){
+      if (line == null) {
         break;
       }
       run(line);
       hadError = false;
     }
   }
-
 
   private static void run(String source) {
     Scanner scanner = new Scanner(source);
@@ -67,15 +67,14 @@ public class Lox {
 
   private static void report(int line, String where, String message) {
     System.err.println(
-      "[line " + line + "] Error" + where + ": " + message);
+        "[line " + line + "] Error" + where + ": " + message);
     hadError = true;
   }
 
   static void error(Token token, String message) {
-    if(token.type == TokenType.EOF) {
+    if (token.type == TokenType.EOF) {
       report(token.line, " at end ", message);
-    }
-    else{
+    } else {
       report(token.line, " at ' " + token.lexeme + "'", message);
     }
   }

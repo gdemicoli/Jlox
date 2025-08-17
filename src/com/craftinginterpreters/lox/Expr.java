@@ -1,69 +1,76 @@
 package com.craftinginterpreters.lox;
 
-abstract class Expr{
-   interface Visitor<R> {
-   R visitBinaryExpr(Binary expr);
-   R visitGroupingExpr(Grouping expr);
-   R visitLiteralExpr(Literal expr);
-   R visitUnaryExpr(Unary expr);
-}
-// visitor pattern high level:
-// we give the the class method e.g Binary
-// the object containg method we want it to pass itself in as an arguement
-static class Binary extends Expr {
-   Binary(Expr left, Token operator, Expr right) {
-     this.left = left;
-     this.operator = operator;
-     this.right = right;
-   }
+abstract class Expr {
+  interface Visitor<R> {
+    R visitBinaryExpr(Binary expr);
 
-   final Expr left;
-   final Token operator;
-   final Expr right;
+    R visitGroupingExpr(Grouping expr);
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitBinaryExpr(this);
-   }
- }
- static class Grouping extends Expr {
-   Grouping(Expr expression) {
-     this.expression = expression;
-   }
+    R visitLiteralExpr(Literal expr);
 
-   final Expr expression;
+    R visitUnaryExpr(Unary expr);
+  }
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitGroupingExpr(this);
-   }
- }
- static class Literal extends Expr {
-   Literal(Object value) {
-     this.value = value;
-   }
+  // visitor pattern high level:
+  // we give the the class method e.g Binary
+  // the object containg method we want it to pass itself in as an arguement
+  static class Binary extends Expr {
+    Binary(Expr left, Token operator, Expr right) {
+      this.left = left;
+      this.operator = operator;
+      this.right = right;
+    }
 
-   final Object value;
+    final Expr left;
+    final Token operator;
+    final Expr right;
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitLiteralExpr(this);
-   }
- }
- static class Unary extends Expr {
-   Unary(Token operator, Expr right) {
-     this.operator = operator;
-     this.right = right;
-   }
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBinaryExpr(this);
+    }
+  }
 
-   final Token operator;
-   final Expr right;
+  static class Grouping extends Expr {
+    Grouping(Expr expression) {
+      this.expression = expression;
+    }
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitUnaryExpr(this);
-   }
- }
+    final Expr expression;
 
-   abstract <R> R accept(Visitor<R> visitor);
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitGroupingExpr(this);
+    }
+  }
+
+  static class Literal extends Expr {
+    Literal(Object value) {
+      this.value = value;
+    }
+
+    final Object value;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitLiteralExpr(this);
+    }
+  }
+
+  static class Unary extends Expr {
+    Unary(Token operator, Expr right) {
+      this.operator = operator;
+      this.right = right;
+    }
+
+    final Token operator;
+    final Expr right;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitUnaryExpr(this);
+    }
+  }
+
+  abstract <R> R accept(Visitor<R> visitor);
 }

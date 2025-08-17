@@ -4,7 +4,8 @@ import static com.craftinginterpreters.lox.TokenType.*;
 import java.util.List;
 
 class Parser {
-    private  static class ParseError extends RuntimeException {}
+    private static class ParseError extends RuntimeException {
+    }
 
     private final List<Token> tokens;
     private int current = 0; // points to next token
@@ -13,16 +14,16 @@ class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse(){
-     try {
-        return expression();
-     }   
-     catch (ParseError error) {
-        return null;
-     }
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        }
     }
-    //Each method for parsing a grammar rule produces an AST for that rule.
-    //When the body of the rule contains a non terminal, we call that other rule's method
+    // Each method for parsing a grammar rule produces an AST for that rule.
+    // When the body of the rule contains a non terminal, we call that other rule's
+    // method
 
     private Expr expression() {
         Expr expr = equality();
@@ -54,7 +55,7 @@ class Parser {
         // loops through comparison operators each time appending
         // the previous expression to the left hand side of the current one
         // e.g.: a < b <= c = ((a,<,b), <=, c)
-        while(match(GREATER,GREATER_EQUAL,LESS,LESS_EQUAL)) {
+        while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
             Token operator = previous();
             Expr right = term();
             expr = new Expr.Binary(expr, operator, right);
@@ -90,7 +91,7 @@ class Parser {
     }
 
     private Expr unary() {
-        if(match(BANG, MINUS)) {
+        if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
@@ -100,16 +101,19 @@ class Parser {
     }
 
     private Expr primary() {
-        if (match(FALSE)) return new Expr.Literal(false);
-        if (match(TRUE)) return new Expr.Literal(true);
-        if (match(NIL)) return new Expr.Literal(null);
+        if (match(FALSE))
+            return new Expr.Literal(false);
+        if (match(TRUE))
+            return new Expr.Literal(true);
+        if (match(NIL))
+            return new Expr.Literal(null);
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
         }
 
         if (match(LEFT_PAREN)) {
-            // 1. gets ( 
+            // 1. gets (
             // 2. parses inner expression
             // 3. Will throw error up call stack if ) is not present
             Expr expr = expression();
@@ -120,12 +124,10 @@ class Parser {
         throw error(peek(), "Expect expression");
     }
 
-
-
     private boolean match(TokenType... types) {
         // checks to see if the current token has any of the given types
-        for(TokenType type : types) {
-            if(check(type)) {
+        for (TokenType type : types) {
+            if (check(type)) {
                 advance();
                 return true;
             }
@@ -133,8 +135,8 @@ class Parser {
         return false;
     }
 
-    private Token consume(TokenType type, String message){
-        if (check(type)){
+    private Token consume(TokenType type, String message) {
+        if (check(type)) {
             return advance();
         }
         throw error(peek(), message);
@@ -142,7 +144,7 @@ class Parser {
 
     private boolean check(TokenType type) {
         // returns true if the current token is of the given type (doesn't consume it)
-        if (isAtEnd()){
+        if (isAtEnd()) {
             return false;
         }
         return peek().type == type;
@@ -150,17 +152,17 @@ class Parser {
 
     private Token advance() {
         // consumes the current token & returns it
-        if(!isAtEnd()) {
+        if (!isAtEnd()) {
             current++;
         }
         return previous();
     }
 
-    private  boolean isAtEnd() {
+    private boolean isAtEnd() {
         return peek().type == EOF;
     }
 
-    private  Token peek() {
+    private Token peek() {
         return tokens.get(current);
     }
 
@@ -175,16 +177,16 @@ class Parser {
     }
 
     private void synchronise() {
-        // Looks for part of the file 
+        // Looks for part of the file
         // which is outside of error boundary to start parsing
         advance();
 
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
             if (previous().type == SEMICOLON) {
                 return;
             }
 
-            switch(peek().type) {
+            switch (peek().type) {
                 case CLASS:
                 case FUN:
                 case VAR:
@@ -193,7 +195,7 @@ class Parser {
                 case WHILE:
                 case PRINT:
                 case RETURN:
-                return;
+                    return;
             }
 
             advance();
