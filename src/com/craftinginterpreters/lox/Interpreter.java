@@ -1,4 +1,6 @@
 package com.craftinginterpreters.lox;
+
+import java.util.List;
 // EXAMPLE evaluation of literal:
 
 // 1. evaluate(literalExpr) is called which runs literal.accept(this)
@@ -14,12 +16,14 @@ package com.craftinginterpreters.lox;
 // 4. which then calls the visit literal method here, 6 will be returned
 // 5. Back within the visit method in step 3 the switch makes it negative
 // 6. -6 is returned
-class Interpreter implements Expr.Visitor<Object> {
+class Interpreter implements Expr.Visitor<Object>,
+        Stmt.Visitor<Void> {
 
-    void interpret(Expr expression) {
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
@@ -101,6 +105,23 @@ class Interpreter implements Expr.Visitor<Object> {
 
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
     }
 
     @Override
