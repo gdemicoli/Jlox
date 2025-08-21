@@ -98,6 +98,37 @@ class Scanner {
                     // A comment goes till end of line
                     while (peek() != '\n' && !isAtEnd())
                         advance();
+                }
+                // Review this later since there is no check for unterminated comment blocks
+                if (match('*')) {
+                    int nest = 1;
+
+                    while (nest > 0 && !isAtEnd()) {
+                        if (peek() == '\n') {
+                            line++;
+
+                        }
+                        if (peek() == '*' && peekNext() == '/') {
+                            advance(); // Consume '*'
+                            advance(); // Consume '/'
+
+                            nest -= 1;
+                            if (nest == 0) {
+                                break;
+                            }
+                            continue;
+                        }
+                        if (peek() == '/' && peekNext() == '*') {
+                            nest += 1;
+                            advance(); // Consume '*'
+                            advance(); // Consume '/'
+                            continue;
+                        }
+
+                        advance();
+
+                    } /* *******/
+
                 } else {
                     addToken(SLASH);
                 }
