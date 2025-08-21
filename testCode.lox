@@ -1,8 +1,8 @@
 var x = 10;
 /* This is my comment */
-10*3;
+var y = 2;
 /* 
 Multi Line 
 comment
 */
-s= "hello";
+print x + y;
