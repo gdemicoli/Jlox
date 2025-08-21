@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
-  private static final Interpreter interpreter = new Interpreter();
+  // private static final Interpreter interpreter = new Interpreter();
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
 
@@ -59,7 +59,7 @@ public class Lox {
       System.out.println(t);
     }
 
-    // Parser parser = new Parser(tokens);
+    Parser parser = new Parser(tokens);
     // List<Stmt> statements = parser.parse();
 
     if (hadError) {
