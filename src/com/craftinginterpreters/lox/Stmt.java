@@ -2,55 +2,50 @@ package com.craftinginterpreters.lox;
 
 import java.util.List;
 
-abstract class Stmt {
-  interface Visitor<R> {
-    R visitExpressionStmt(Expression stmt);
+abstract class Stmt{
+   interface Visitor<R> {
+   R visitExpressionStmt(Expression stmt);
+   R visitPrintStmt(Print stmt);
+   R visitVarStmt(Var stmt);
+}
+ static class Expression extends Stmt {
+   Expression(Expr expression) {
+     this.expression = expression;
+   }
 
-    R visitPrintStmt(Print stmt);
+   final Expr expression;
 
-    R visitVarStmt(Var stmt);
-  }
+   @Override
+   <R> R accept(Visitor<R> visitor) {
+    return visitor.visitExpressionStmt(this);
+   }
+ }
+ static class Print extends Stmt {
+   Print(Expr expression) {
+     this.expression = expression;
+   }
 
-  static class Expression extends Stmt {
-    Expression(Expr expression) {
-      this.expression = expression;
-    }
+   final Expr expression;
 
-    final Expr expression;
+   @Override
+   <R> R accept(Visitor<R> visitor) {
+    return visitor.visitPrintStmt(this);
+   }
+ }
+ static class Var extends Stmt {
+   Var(Token name, Expr intializer) {
+     this.name = name;
+     this.intializer = intializer;
+   }
 
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitExpressionStmt(this);
-    }
-  }
+   final Token name;
+   final Expr intializer;
 
-  static class Print extends Stmt {
-    Print(Expr expression) {
-      this.expression = expression;
-    }
+   @Override
+   <R> R accept(Visitor<R> visitor) {
+    return visitor.visitVarStmt(this);
+   }
+ }
 
-    final Expr expression;
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitPrintStmt(this);
-    }
-  }
-
-  static class Var extends Stmt {
-    Var(Token name, Expr intializer) {
-      this.name = name;
-      this.intializer = intializer;
-    }
-
-    final Token name;
-    final Expr intializer;
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitVarStmt(this);
-    }
-  }
-
-  abstract <R> R accept(Visitor<R> visitor);
+   abstract <R> R accept(Visitor<R> visitor);
 }

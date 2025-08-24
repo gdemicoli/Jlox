@@ -2,8 +2,14 @@ package com.craftinginterpreters.lox;
 
 import java.util.List;
 
+// visitor pattern high level:
+// we give the the class method e.g Binary
+// the object containg method we want it to pass itself in as an arguement
+
 abstract class Expr {
   interface Visitor<R> {
+    R visitAssignExpr(Assign expr);
+
     R visitBinaryExpr(Binary expr);
 
     R visitGroupingExpr(Grouping expr);
@@ -15,9 +21,21 @@ abstract class Expr {
     R visitVariableExpr(Variable expr);
   }
 
-  // visitor pattern high level:
-  // we give the the class method e.g Binary
-  // the object containg method we want it to pass itself in as an arguement
+  static class Assign extends Expr {
+    Assign(Token name, Expr value) {
+      this.name = name;
+      this.value = value;
+    }
+
+    final Token name;
+    final Expr value;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitAssignExpr(this);
+    }
+  }
+
   static class Binary extends Expr {
     Binary(Expr left, Token operator, Expr right) {
       this.left = left;
