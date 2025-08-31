@@ -1,7 +1,6 @@
 package com.craftinginterpreters.lox;
 
 import java.util.List;
-
 // visitor pattern high level:
 // we give the the class method e.g Binary
 // the object containg method we want it to pass itself in as an arguement
