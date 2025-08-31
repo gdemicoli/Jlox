@@ -6,7 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Environment {
+    final Environment enclosing;
     private final Map<String, Object> values = new HashMap<>();
+
+    Environment() {
+        enclosing = null;
+    }
+
+    Environment(Environment enclosing) {
+        this.enclosing = enclosing;
+    }
 
     Object get(Token name) {
         if (values.containsKey(name.lexeme)) {
