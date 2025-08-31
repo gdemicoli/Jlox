@@ -25,6 +25,16 @@ class Parser {
         }
         return statements;
     }
+
+    Expr tryParseExpressExpr() {
+        try {
+            Expr expr = expression();
+            consume(TokenType.EOF, "Expect end of expression");
+            return expr;
+        } catch (ParseError e) {
+            return null;
+        }
+    }
     // Each method for parsing a grammar rule produces an AST for that rule.
     // When the body of the rule contains a non terminal, we call that other rule's
     // method
@@ -222,7 +232,7 @@ class Parser {
     private boolean check(TokenType type) {
         // returns true if the current token is of the given type (doesn't consume it)
         if (isAtEnd()) {
-            return false;
+            return type == EOF;
         }
         return peek().type == type;
     }

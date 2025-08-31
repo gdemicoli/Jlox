@@ -30,7 +30,7 @@ class Interpreter implements Expr.Visitor<Object>,
         }
     }
 
-    private String stringify(Object object) {
+    public String stringify(Object object) {
         if (object == null) {
             return "nil";
         }
@@ -109,7 +109,7 @@ class Interpreter implements Expr.Visitor<Object>,
         return evaluate(expr.expression);
     }
 
-    private Object evaluate(Expr expr) {
+    public Object evaluate(Expr expr) {
         return expr.accept(this);
     }
 
