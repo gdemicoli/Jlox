@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Environment {
+    public static final Object UNINTIALISED = new Object();
+
     final Environment enclosing;
     private final Map<String, Object> values = new HashMap<>();
 
@@ -19,7 +21,11 @@ public class Environment {
 
     Object get(Token name) {
         if (values.containsKey(name.lexeme)) {
-            return values.get(name.lexeme);
+            Object value = values.get(name.lexeme);
+            if (value == UNINTIALISED) {
+                throw new RuntimeError(name, "Uninitialised variable '" + name.lexeme + "'.");
+            }
+            return value;
         }
 
         if (enclosing != null) {
@@ -44,6 +50,11 @@ public class Environment {
     }
 
     void define(String name, Object value) {
-        values.put(name, value);
+        if (value == null) {
+            values.put(name, UNINTIALISED);
+
+        } else {
+            values.put(name, value);
+        }
     }
 }

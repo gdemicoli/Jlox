@@ -96,8 +96,10 @@ class Scanner {
             case '/':
                 if (match('/')) {
                     // A comment goes till end of line
-                    while (peek() != '\n' && !isAtEnd())
+                    while (peek() != '\n' && !isAtEnd()) {
                         advance();
+                    }
+                    break;
                 }
                 // FIX-ME: since there is no check for unterminated comment blocks
                 if (match('*')) {

@@ -1,29 +1,5 @@
-var x = 10;
-/* This is my comment */
-var y = 2;
-/* 
-Multi Line 
-comment
-*/
-print x + y;
-print "-------------";
-print "ScopingTest:";
- var a = "global a";
-  var b = "global b";
-  var c = "global c";
-  {
-    var a = "outer a";
-    var b = "outer b";
-    {
-      var a = "inner a";
-      print a;
-      print b;
-      print c;
-    }
-    print a;
-    print b;
-    print c;
-  }
-  print a;
-  print b;
-  print c;
+
+var a; var b; // coment
+     a = "assigned";
+     print a; //comment
+     print b; 
