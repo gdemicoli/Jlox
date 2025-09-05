@@ -19,6 +19,7 @@ public class GenerateAst {
                 "Binary   : Expr left, Token operator, Expr right",
                 "Grouping : Expr expression",
                 "Literal  : Object value",
+                "Logical : Expr left, Token operator Expr right",
                 "Unary    : Token operator, Expr right",
                 "Variable : Token name"));
 
@@ -26,9 +27,10 @@ public class GenerateAst {
                 "Block  :List<Stmt> statements",
                 "Expression : Expr expression",
                 "If: Expr condition, Stmt thenBranch,"
-                + "Stmt elseBranch",
+                        + "Stmt elseBranch",
                 "Print : Expr expression",
-                "Var : Token name, Expr intializer"));
+                "Var : Token name, Expr intializer",
+                "while :  Expr condition Stmt body"));
     }
 
     private static void defineAst(
