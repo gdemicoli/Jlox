@@ -20,6 +20,9 @@ class Interpreter implements Expr.Visitor<Object>,
         Stmt.Visitor<Void> {
     private Environment environment = new Environment();
 
+    class BreakException extends RuntimeException {
+    };
+
     void interpret(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) {
@@ -188,10 +191,19 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitWhileStmt(Stmt.While stmt) {
-        while (isTruthy(evaluate(stmt.condition))) {
-            execute(stmt.body);
+        try {
+            while (isTruthy(evaluate(stmt.condition))) {
+                execute(stmt.body);
+            }
+        } catch (BreakException e) {
+
         }
         return null;
+    }
+
+    @Override
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        throw new BreakException();
     }
 
     @Override

@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.craftinginterpreters.lox.Stmt.Var;
-
 class Parser {
     private static class ParseError extends RuntimeException {
     }
 
     private final List<Token> tokens;
     private int current = 0; // points to next token
+    private int loopDepth = 0;
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -74,6 +73,9 @@ class Parser {
         if (match(LEFT_BRACE)) {
             return new Stmt.Block(block());
         }
+        if (match(BREAK)) {
+            return breakStatement();
+        }
         return expressionStatement();
     }
 
@@ -100,9 +102,9 @@ class Parser {
             increment = expression();
         }
         consume(RIGHT_PAREN, "Expect') after for clauses.");
-
+        loopDepth += 1;
         Stmt body = statement();
-
+        loopDepth -= 1;
         if (increment != null) {
             body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
         }
@@ -156,9 +158,18 @@ class Parser {
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expect ')' after condition.");
+        loopDepth += 1;
         Stmt body = statement();
-
+        loopDepth -= 1;
         return new Stmt.While(condition, body);
+    }
+
+    private Stmt breakStatement() {
+        if (loopDepth == 0) {
+            error(previous(), "break must be used inside loop.");
+        }
+        consume(SEMICOLON, "Expect ';' after 'break'.");
+        return new Stmt.Break();
     }
 
     private Stmt expressionStatement() {
