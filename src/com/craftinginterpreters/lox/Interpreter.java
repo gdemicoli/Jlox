@@ -19,7 +19,27 @@ import java.util.ArrayList;
 // 6. -6 is returned
 class Interpreter implements Expr.Visitor<Object>,
         Stmt.Visitor<Void> {
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    private Environment environment = globals;
+
+    Interpreter() {
+        globals.define("clock", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguements) {
+                return (double) System.currentTimeMillis() / 100.0;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+    }
 
     class BreakException extends RuntimeException {
     };
@@ -271,7 +291,17 @@ class Interpreter implements Expr.Visitor<Object>,
             arguements.add(equals(arguement));
         }
 
+        if (!(callee instanceof LoxCallable)) {
+            throw new RuntimeError(expr.paren,
+                    "Can only call functions and classes.");
+        }
+
         LoxCallable function = (LoxCallable) callee;
+        if ((arguements.size() != function.arity())) {
+            throw new RuntimeError(expr.paren, "Expected " +
+                    function.arity() + " arguements, but got " +
+                    arguements.size() + ".");
+        }
         return function.call(this, arguements);
     }
 }
