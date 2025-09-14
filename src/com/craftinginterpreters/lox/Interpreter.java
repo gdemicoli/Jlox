@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import java.util.List;
+import java.util.ArrayList;
 // EXAMPLE evaluation of literal:
 
 // 1. evaluate(literalExpr) is called which runs literal.accept(this)
@@ -259,5 +260,18 @@ class Interpreter implements Expr.Visitor<Object>,
 
         // Unreachable
         return null;
+    }
+
+    @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        Object callee = evaluate(expr.callee);
+
+        List<Object> arguements = new ArrayList<>();
+        for (Expr arguement : expr.arguments) {
+            arguements.add(equals(arguement));
+        }
+
+        LoxCallable function = (LoxCallable) callee;
+        return function.call(this, arguements);
     }
 }
