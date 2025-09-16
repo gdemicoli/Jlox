@@ -183,6 +183,13 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Void visitFunctionStmt(Stmt.Function stmt) {
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme, function);
+        return null;
+    }
+
+    @Override
     public Void visitIfStmt(Stmt.If stmt) {
         if (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.thenBranch);
@@ -202,8 +209,8 @@ class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
         Object value = null;
-        if (stmt.intializer != null) {
-            value = evaluate(stmt.intializer);
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
         }
 
         environment.define(stmt.name.lexeme, value);
@@ -288,7 +295,7 @@ class Interpreter implements Expr.Visitor<Object>,
 
         List<Object> arguements = new ArrayList<>();
         for (Expr arguement : expr.arguments) {
-            arguements.add(equals(arguement));
+            arguements.add(evaluate(arguement));
         }
 
         if (!(callee instanceof LoxCallable)) {
