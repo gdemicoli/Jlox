@@ -72,8 +72,18 @@ public class Lox {
     if (hadError) {
       return;
     }
+    // FIX-ME: come back here... we need to finish implement the anoymous function
+    // The parser is nearly done, we need to print the Stmt list to check if the
+    // anon funcs are being parsed correctly
+    // currently the abstract class stmt extended in the interpreter is missing the
+    // concrete
+    // defininition for visitFunc Stmt DONE: parser is correctly parsing anon funcs
+    // as exprs
+    for (Stmt stmt : statements) {
+      System.out.println(stmt);
+    }
 
-    interpreter.interpret(statements);
+    // interpreter.interpret(statements);
 
   }
 
