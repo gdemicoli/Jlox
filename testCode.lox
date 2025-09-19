@@ -6,6 +6,8 @@ fn(i); }
 thrice(fun (a) {
       print a;
 });
+
+(fun(a){print a;})(10);
     // "1".
     // "2".
     // "3".

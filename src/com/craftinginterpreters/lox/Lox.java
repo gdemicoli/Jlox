@@ -79,11 +79,9 @@ public class Lox {
     // concrete
     // defininition for visitFunc Stmt DONE: parser is correctly parsing anon funcs
     // as exprs
-    for (Stmt stmt : statements) {
-      System.out.println(stmt);
-    }
+    // Now need to properly implement visitFuncExpr in interpreter....
 
-    // interpreter.interpret(statements);
+    interpreter.interpret(statements);
 
   }
 

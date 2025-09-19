@@ -71,8 +71,8 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
-    public Object visitFunctionExpr(Expr.Function function) {
-        return function.body;
+    public Object visitFunctionExpr(Expr.Function expr) {
+        return new LoxFunction(expr, environment);
     }
 
     @Override
@@ -309,6 +309,7 @@ class Interpreter implements Expr.Visitor<Object>,
 
         List<Object> arguements = new ArrayList<>();
         for (Expr arguement : expr.arguments) {
+
             arguements.add(evaluate(arguement));
         }
 
