@@ -10,6 +10,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private LoopType currentLoop = LoopType.NONE;
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -18,6 +19,11 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private enum FunctionType {
         NONE,
         FUNCTION
+    }
+
+    private enum LoopType {
+        NONE,
+        LOOP
     }
 
     void resolve(List<Stmt> statements) {
@@ -65,6 +71,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
     public Void visitReturnStmt(Stmt.Return stmt) {
         if (currentFunction == FunctionType.NONE) {
             Lox.error(stmt.keyword, "Can't return from top-level code.");
@@ -72,6 +79,15 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
         if (stmt.value != null) {
             resolve(stmt.value);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        if (currentLoop == LoopType.NONE) {
+            Lox.error(stmt.keyword, "Break must be inside loop.");
         }
 
         return null;
@@ -89,8 +105,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitWhileStmt(Stmt.While stmt) {
+        LoopType enclosingLoop = currentLoop;
+        currentLoop = LoopType.LOOP;
+
         resolve(stmt.condition);
         resolve(stmt.body);
+
+        currentLoop = enclosingLoop;
 
         return null;
     }
