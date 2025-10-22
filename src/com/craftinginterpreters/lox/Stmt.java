@@ -2,137 +2,157 @@ package com.craftinginterpreters.lox;
 
 import java.util.List;
 
-abstract class Stmt{
-   interface Visitor<R> {
-   R visitBlockStmt(Block stmt);
-   R visitExpressionStmt(Expression stmt);
-   R visitFunctionStmt(Function stmt);
-   R visitIfStmt(If stmt);
-   R visitPrintStmt(Print stmt);
-   R visitReturnStmt(Return stmt);
-   R visitVarStmt(Var stmt);
-   R visitWhileStmt(While stmt);
-   R visitBreakStmt(Break stmt);
-}
- static class Block extends Stmt {
-   Block(List<Stmt> statements) {
-     this.statements = statements;
-   }
+abstract class Stmt {
+  interface Visitor<R> {
+    R visitBlockStmt(Block stmt);
 
-   final List<Stmt> statements;
+    R visitExpressionStmt(Expression stmt);
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitBlockStmt(this);
-   }
- }
- static class Expression extends Stmt {
-   Expression(Expr expression) {
-     this.expression = expression;
-   }
+    R visitFunctionStmt(Function stmt);
 
-   final Expr expression;
+    R visitIfStmt(If stmt);
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitExpressionStmt(this);
-   }
- }
- static class Function extends Stmt {
-   Function(Token name, List<Token> params, List<Stmt> body) {
-     this.name = name;
-     this.params = params;
-     this.body = body;
-   }
+    R visitPrintStmt(Print stmt);
 
-   final Token name;
-   final List<Token> params;
-   final List<Stmt> body;
+    R visitReturnStmt(Return stmt);
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitFunctionStmt(this);
-   }
- }
- static class If extends Stmt {
-   If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
-     this.condition = condition;
-     this.thenBranch = thenBranch;
-     this.elseBranch = elseBranch;
-   }
+    R visitVarStmt(Var stmt);
 
-   final Expr condition;
-   final Stmt thenBranch;
-   final Stmt elseBranch;
+    R visitWhileStmt(While stmt);
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitIfStmt(this);
-   }
- }
- static class Print extends Stmt {
-   Print(Expr expression) {
-     this.expression = expression;
-   }
+    R visitBreakStmt(Break stmt);
+  }
 
-   final Expr expression;
+  static class Block extends Stmt {
+    Block(List<Stmt> statements) {
+      this.statements = statements;
+    }
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitPrintStmt(this);
-   }
- }
- static class Return extends Stmt {
-   Return(Token keyword, Expr value) {
-     this.keyword = keyword;
-     this.value = value;
-   }
+    final List<Stmt> statements;
 
-   final Token keyword;
-   final Expr value;
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBlockStmt(this);
+    }
+  }
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitReturnStmt(this);
-   }
- }
- static class Var extends Stmt {
-   Var(Token name, Expr initializer) {
-     this.name = name;
-     this.initializer = initializer;
-   }
+  static class Expression extends Stmt {
+    Expression(Expr expression) {
+      this.expression = expression;
+    }
 
-   final Token name;
-   final Expr initializer;
+    final Expr expression;
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitVarStmt(this);
-   }
- }
- static class While extends Stmt {
-   While(Expr condition, Stmt body) {
-     this.condition = condition;
-     this.body = body;
-   }
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitExpressionStmt(this);
+    }
+  }
 
-   final Expr condition;
-   final Stmt body;
+  static class Function extends Stmt {
+    Function(Token name, List<Token> params, List<Stmt> body) {
+      this.name = name;
+      this.params = params;
+      this.body = body;
+    }
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitWhileStmt(this);
-   }
- }
- static class Break extends Stmt {
-   Break() {
-   }
+    final Token name;
+    final List<Token> params;
+    final List<Stmt> body;
 
-   @Override
-   <R> R accept(Visitor<R> visitor) {
-    return visitor.visitBreakStmt(this);
-   }
- }
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitFunctionStmt(this);
+    }
+  }
 
-   abstract <R> R accept(Visitor<R> visitor);
+  static class If extends Stmt {
+    If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
+      this.condition = condition;
+      this.thenBranch = thenBranch;
+      this.elseBranch = elseBranch;
+    }
+
+    final Expr condition;
+    final Stmt thenBranch;
+    final Stmt elseBranch;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitIfStmt(this);
+    }
+  }
+
+  static class Print extends Stmt {
+    Print(Expr expression) {
+      this.expression = expression;
+    }
+
+    final Expr expression;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitPrintStmt(this);
+    }
+  }
+
+  static class Return extends Stmt {
+    Return(Token keyword, Expr value) {
+      this.keyword = keyword;
+      this.value = value;
+    }
+
+    final Token keyword;
+    final Expr value;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitReturnStmt(this);
+    }
+  }
+
+  static class Var extends Stmt {
+    Var(Token name, Expr initializer) {
+      this.name = name;
+      this.initializer = initializer;
+    }
+
+    final Token name;
+    final Expr initializer;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitVarStmt(this);
+    }
+  }
+
+  static class While extends Stmt {
+    While(Expr condition, Stmt body) {
+      this.condition = condition;
+      this.body = body;
+    }
+
+    final Expr condition;
+    final Stmt body;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitWhileStmt(this);
+    }
+  }
+
+  static class Break extends Stmt {
+    final Token keyword;
+
+    Break(Token keyword) {
+      this.keyword = keyword;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBreakStmt(this);
+    }
+  }
+
+  abstract <R> R accept(Visitor<R> visitor);
 }
