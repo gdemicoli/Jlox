@@ -1,5 +1,5 @@
 
 var a = "outer";
 {
-var a = a; 
+var a = "hello"; 
 }

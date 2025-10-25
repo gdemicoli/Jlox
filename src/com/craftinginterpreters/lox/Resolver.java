@@ -11,10 +11,12 @@ import com.craftinginterpreters.lox.Stmt.Var;
 class VarInfo {
     boolean initialised;
     boolean used;
+    Token token;
 
-    VarInfo(boolean initialised, boolean used) {
+    VarInfo(boolean initialised, boolean used, Token token) {
         this.initialised = initialised;
         this.used = used;
+        this.token = token;
     }
 }
 
@@ -190,6 +192,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             Lox.error(expr.name, "Can't read local variable in its own initializer.");
         }
         resolveLocal(expr, expr.name);
+        scopes.peek().get(expr.name.lexeme).used = true;
         return null;
     }
 
@@ -234,7 +237,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     private void endScope() {
-        scopes.pop();
+        Map<String, VarInfo> scope = scopes.pop();
+        for (Map.Entry<String, VarInfo> entry : scope.entrySet()) {
+            if (!entry.getValue().used) {
+                Lox.error(entry.getValue().token, "Variable " + entry.getKey() + " declared but never used.");
+            }
+        }
     }
 
     // declares first so that newly declared var isn't used in its own assignment
@@ -246,7 +254,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         if (scope.containsKey(name.lexeme)) {
             Lox.error(name, "Already variable with this name in scope.");
         }
-        VarInfo info = new VarInfo(false, false);
+        VarInfo info = new VarInfo(false, false, name);
         scope.put(name.lexeme, info);
     }
 
