@@ -6,9 +6,21 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.function.Function;
 
+import com.craftinginterpreters.lox.Stmt.Var;
+
+class VarInfo {
+    boolean initialised;
+    boolean used;
+
+    VarInfo(boolean initialised, boolean used) {
+        this.initialised = initialised;
+        this.used = used;
+    }
+}
+
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private final Interpreter interpreter;
-    private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+    private final Stack<Map<String, VarInfo>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private LoopType currentLoop = LoopType.NONE;
 
@@ -174,7 +186,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVariableExpr(Expr.Variable expr) {
-        if (!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
+        if (!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme).initialised == Boolean.FALSE) {
             Lox.error(expr.name, "Can't read local variable in its own initializer.");
         }
         resolveLocal(expr, expr.name);
@@ -218,7 +230,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     private void beginScope() {
-        scopes.push(new HashMap<String, Boolean>());
+        scopes.push(new HashMap<String, VarInfo>());
     }
 
     private void endScope() {
@@ -230,12 +242,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         if (scopes.isEmpty()) {
             return;
         }
-        Map<String, Boolean> scope = scopes.peek();
+        Map<String, VarInfo> scope = scopes.peek();
         if (scope.containsKey(name.lexeme)) {
             Lox.error(name, "Already variable with this name in scope.");
         }
-
-        scope.put(name.lexeme, false);
+        VarInfo info = new VarInfo(false, false);
+        scope.put(name.lexeme, info);
     }
 
     // once declaration has passed, the variable can be used safely0
@@ -243,7 +255,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         if (scopes.isEmpty()) {
             return;
         }
-        scopes.peek().put(name.lexeme, true);
+        scopes.peek().get(name.lexeme).initialised = true;
     }
 
     private void resolveLocal(Expr expr, Token name) {
