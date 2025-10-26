@@ -175,7 +175,7 @@ class Interpreter implements Expr.Visitor<Object>,
         stmt.accept(this);
     }
 
-    void resolve(Expr expr, int depth) {
+    void resolve(Expr expr, int depth, int index) {
         locals.put(expr, depth);
     }
 
