@@ -25,6 +25,7 @@ class Interpreter implements Expr.Visitor<Object>,
     final Environment globals = new Environment();
     private Environment environment = globals;
     private final Map<Expr, Integer> locals = new HashMap<>();
+    private final ArrayList<Integer> localsArray = new ArrayList<>();
 
     Interpreter() {
         globals.define("clock", new LoxCallable() {
@@ -121,6 +122,7 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     private Object lookUpVariable(Token name, Expr expr) {
+        // make this an array look up
         Integer distance = locals.get(expr);
         if (distance != null) {
             return environment.getAt(distance, name.lexeme);
