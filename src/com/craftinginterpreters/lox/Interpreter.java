@@ -20,12 +20,23 @@ import java.util.Map;
 // 4. which then calls the visit literal method here, 6 will be returned
 // 5. Back within the visit method in step 3 the switch makes it negative
 // 6. -6 is returned
+
+class LocalInfo {
+    final int distance;
+    final int index;
+
+    LocalInfo(int distance, int index) {
+        this.distance = distance;
+        this.index = index;
+    }
+
+}
+
 class Interpreter implements Expr.Visitor<Object>,
         Stmt.Visitor<Void> {
     final Environment globals = new Environment();
     private Environment environment = globals;
-    private final Map<Expr, Integer> locals = new HashMap<>();
-    private final ArrayList<Integer> localsArray = new ArrayList<>();
+    private final Map<Expr, LocalInfo> locals = new HashMap<>();
 
     Interpreter() {
         globals.define("clock", new LoxCallable() {
@@ -123,9 +134,9 @@ class Interpreter implements Expr.Visitor<Object>,
 
     private Object lookUpVariable(Token name, Expr expr) {
         // make this an array look up
-        Integer distance = locals.get(expr);
-        if (distance != null) {
-            return environment.getAt(distance, name.lexeme);
+        LocalInfo info = locals.get(expr);
+        if (info != null) {
+            return environment.getAt(info.distance, info.index);
         } else {
             return globals.get(name);
         }
@@ -178,7 +189,7 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     void resolve(Expr expr, int depth, int index) {
-        locals.put(expr, depth);
+        locals.put(expr, new LocalInfo(depth, index));
     }
 
     void executeBlock(List<Stmt> statements, Environment environment) {
@@ -270,10 +281,10 @@ class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        Integer distance = locals.get(expr);
+        LocalInfo info = locals.get(expr);
 
-        if (distance != null) {
-            environment.assignAt(distance, expr.name, value);
+        if (info != null) {
+            environment.assignAt(info.distance, info.index, expr.name, value);
         } else {
             globals.assign(expr.name, value);
         }
