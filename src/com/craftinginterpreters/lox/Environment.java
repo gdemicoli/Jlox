@@ -4,12 +4,24 @@ import static com.craftinginterpreters.lox.TokenType.values;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Environment {
     public static final Object UNINTIALISED = new Object();
 
     final Environment enclosing;
-    private final Map<String, Object> values = new HashMap<>();
+    // comeback here..
+    // we need to figure how to handle global variables.
+    // Currently all environments have a global HM & a local array
+    // this is redundant since locals will not use the global HM and vice versa
+    // we also need to figure out how to handle the define method
+    // At the moment it is using the old search HM structure
+    // and not the new indexed pattern for arrays (local vars)
+    // This is fine for globals but for locals it wont work
+    // since they are not stored in a HM anymore
+    private final Map<String, Object> globalValues = new HashMap<>();
+    private final List<Object> values = new ArrayList<>();
 
     Environment() {
         enclosing = null;
@@ -20,8 +32,8 @@ public class Environment {
     }
 
     Object get(Token name) {
-        if (values.containsKey(name.lexeme)) {
-            Object value = values.get(name.lexeme);
+        if (globalValues.containsKey(name.lexeme)) {
+            Object value = globalValues.get(name.lexeme);
             if (value == UNINTIALISED) {
                 throw new RuntimeError(name, "Uninitialised variable '" + name.lexeme + "'.");
             }
@@ -36,8 +48,8 @@ public class Environment {
     }
 
     void assign(Token name, Object value) {
-        if (values.containsKey(name.lexeme)) {
-            values.put(name.lexeme, value);
+        if (globalValues.containsKey(name.lexeme)) {
+            globalValues.put(name.lexeme, value);
             return;
         }
 
@@ -67,12 +79,12 @@ public class Environment {
         return environment;
     }
 
-    Object getAt(int distance, String name) {
-        return ancestor(distance).values.get(name);
+    Object getAt(int distance, int index) {
+        return ancestor(distance).values.get(index);
     }
 
-    void assignAt(int distance, Token name, Object value) {
-        ancestor(distance).values.put(name.lexeme, value);
+    void assignAt(int distance, int index, Object value) {
+        ancestor(distance).values.set(index, value);
     }
 
 }

@@ -284,7 +284,7 @@ class Interpreter implements Expr.Visitor<Object>,
         LocalInfo info = locals.get(expr);
 
         if (info != null) {
-            environment.assignAt(info.distance, info.index, expr.name, value);
+            environment.assignAt(info.distance, info.index, value);
         } else {
             globals.assign(expr.name, value);
         }
