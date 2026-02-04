@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.craftinginterpreters.lox.Stmt.While;
+
 class Parser {
     private static class ParseError extends RuntimeException {
     }
@@ -51,12 +53,29 @@ class Parser {
             if (match(FUN)) {
                 return function("function");
             }
+            if (match(CLASS)) {
+                return classDecleration();
+            }
 
             return statement();
         } catch (ParseError error) {
             synchronise();
             return null;
         }
+    }
+
+    private Stmt classDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        consume(LEFT_BRACE, "Expect '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(function("method"));
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body");
+
+        return new Stmt.Class(name, methods);
     }
 
     // A program is a list of statements
