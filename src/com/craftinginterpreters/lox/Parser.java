@@ -54,7 +54,7 @@ class Parser {
                 return function("function");
             }
             if (match(CLASS)) {
-                return classDecleration();
+                return classDeclaration();
             }
 
             return statement();
