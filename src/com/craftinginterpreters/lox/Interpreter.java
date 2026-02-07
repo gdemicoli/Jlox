@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.craftinginterpreters.lox.Expr.This;
+
 // EXAMPLE evaluation of literal:
 
 // 1. evaluate(literalExpr) is called which runs literal.accept(this)
@@ -111,6 +113,11 @@ class Interpreter implements Expr.Visitor<Object>,
         Object value = evaluate(expr.value);
         ((LoxInstance) object).set(expr.name, value);
         return value;
+    }
+
+    @Override
+    public Object visitThisExpr(This expr) {
+        return lookUpVariable(expr.keyword, expr);
     }
 
     @Override

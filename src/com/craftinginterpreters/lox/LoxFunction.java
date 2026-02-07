@@ -22,6 +22,19 @@ class LoxFunction implements LoxCallable {
         this.name = null;
     }
 
+    private LoxFunction(List<Token> params, List<Stmt> body, String name, Environment closure) {
+        this.params = params;
+        this.body = body;
+        this.name = name;
+        this.closure = closure;
+    }
+
+    LoxFunction bind(LoxInstance instance) {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        return new LoxFunction(params, body, name, environment);
+    }
+
     @Override
     public Object call(Interpreter interpreter,
             List<Object> arguements) {
